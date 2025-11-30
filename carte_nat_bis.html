@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte des nationalités par EPCI</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #map-container {
+            width: 90%;
+            height: 700px;
+            margin: auto;
+            border: 1px solid #ccc;
+        }
+        #loader {
+            display: none;
+            text-align: center;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Nationalités étrangères par EPCI</h2>
+
+<div style="text-align:center;">
+    <label for="selectNat">Sélectionnez une nationalité :</label>
+
+    <select id="selectNat">
+        <option value="">-- Choisir --</option>
+        {% for nat in Nationalite %}
+            <option value="{{ nat }}">{{ nat }}</option>
+        {% endfor %}
+    </select>
+
+    <button onclick="chargerCarte()">Afficher</button>
+</div>
+
+<div id="loader">Chargement de la carte...</div>
+<br>
+
+<div id="map-container"></div>
+
+<script>
+function chargerCarte(){
+    let nat = $("#selectNat").val();
+
+    if(nat === ""){
+        alert("Choisissez une nationalité.");
+        return;
+    }
+
+    $("#loader").show();
+    $("#map-container").html("");
+
+    $.getJSON("/get_data_plot?Nationalite=" + nat, function(data){
+        $("#loader").hide();
+
+        if(data.error){
+            $("#map-container").html("<p style='color:red;'>" + data.error + "</p>");
+        } else {
+            $("#map-container").html(data.map_html);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
